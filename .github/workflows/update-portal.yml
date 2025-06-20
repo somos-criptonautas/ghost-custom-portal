@@ -1,0 +1,23 @@
+name: Auto-Update Portal
+on:
+  schedule:
+    - cron: "0 6 * * *"  # Daily at 6 AM
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download Latest Portal
+        run: |
+          curl -o portal.min.js "https://unpkg.com/@tryghost/portal@latest/umd/portal.min.js"
+          
+      - name: Commit if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add portal.min.js
+          git diff --staged --quiet || git commit -m "Update Portal"
+          git push
